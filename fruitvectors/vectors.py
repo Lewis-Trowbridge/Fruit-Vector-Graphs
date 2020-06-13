@@ -6,19 +6,24 @@ import praw
 whitelisted_subreddit_ids = ["t5_2qjpg", "t5_2qi1r", "t5_2vegg", "t5_2zmfe"]
 
 
-def get_fruit_vectors(fruit_vector_client: praw.Reddit, limit: int):
+def get_fruit_vectors(fruit_vector_client: praw.Reddit, recent: bool, start_limit=0, end_limit=-1):
     posts = fruit_vector_client.redditor("ErmineDev").submissions.new(limit=300)
     fruit_vectors = []
-    count = 1
     for current_post in posts:
         if current_post.subreddit_id in whitelisted_subreddit_ids:
             # The ID of the first non-fruit vector post, stop here if this is also the current post ID
-            if current_post.id != "eos9jv" and (count < limit + 1 or limit == 0):
+            if current_post.id != "eos9jv":
                 fruit_vectors.append(current_post)
             else:
                 break
-            count += 1
-    return fruit_vectors
+    if start_limit > len(fruit_vectors):
+        start_limit = 0
+    if end_limit < start_limit:
+        end_limit = len(fruit_vectors)
+    if recent:
+        return fruit_vectors[start_limit:end_limit][::-1]
+    elif not recent:
+        return fruit_vectors[::-1][start_limit:end_limit]
 
 
 def get_image(url: str, size: list):

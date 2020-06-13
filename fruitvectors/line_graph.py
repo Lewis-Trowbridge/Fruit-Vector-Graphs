@@ -5,13 +5,12 @@ from concurrent.futures import ThreadPoolExecutor, wait
 import fruitvectors
 
 
-def line_graph(praw_client, search_filter=0):
-    search_filter = get_limit(search_filter)
-    fruit_vectors = fruitvectors.get_fruit_vectors(praw_client, search_filter)
+def line_graph(praw_client, start_limit=0, end_limit=-1, recent=True):
+    fruit_vectors = fruitvectors.get_fruit_vectors(praw_client, recent, start_limit, end_limit)
     scores = []
     image_urls = []
     # Iterate through the list backwards
-    for post_number in fruit_vectors[::-1]:
+    for post_number in fruit_vectors:
         current_fruit_vector = post_number
         try:
             image_urls.append(current_fruit_vector.url)
@@ -20,13 +19,6 @@ def line_graph(praw_client, search_filter=0):
         except AttributeError:
             pass
     save_line_graph(scores, image_urls)
-
-
-def get_limit(limit):
-    if type(limit) == str:
-        conversion_dict = {"week": 7, "month": 31}
-        return conversion_dict[limit]
-    return limit
 
 
 def get_line_graph_images(urls: list):
