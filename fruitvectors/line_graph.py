@@ -18,15 +18,15 @@ def line_graph(praw_client, start_limit=0, end_limit=-1, recent=True):
         # If a submission does not have an image, it is probably not useful
         except AttributeError:
             pass
-    save_line_graph(scores, image_urls)
+    _save_line_graph(scores, image_urls)
 
 
-def get_line_graph_images(urls: list):
+def _get_line_graph_images(urls: list):
     graph_size = [int((len(urls) * 120) * 1.75), int((len(urls) * 120) * 1.25)]
     futures = []
     pool = ThreadPoolExecutor()
     for url in urls:
-        futures.append(pool.submit(scale_image, url, [100, 100], graph_size))
+        futures.append(pool.submit(_scale_image, url, [100, 100], graph_size))
     wait(futures)
     images = []
     for future in futures:
@@ -35,7 +35,7 @@ def get_line_graph_images(urls: list):
     return [images, graph_size]
 
 
-def scale_image(url: str, size: list, graph_size: list):
+def _scale_image(url: str, size: list, graph_size: list):
     image = fruitvectors.get_image(url, size)
     # If the image is over 3% of the total graph width or 4.7% of the total graph height, expand the graph
     if image.size[0] / graph_size[0] * 100 > 3 or image.size[1] / graph_size[1] * 100 > 4.7:
@@ -45,8 +45,8 @@ def scale_image(url: str, size: list, graph_size: list):
     return OffsetImage(image_array)
 
 
-def save_line_graph(scores: list, urls: list):
-    images, graph_size = get_line_graph_images(urls)
+def _save_line_graph(scores: list, urls: list):
+    images, graph_size = _get_line_graph_images(urls)
     size = graph_size[0]/100
     vector_figure = plt.figure(figsize=[graph_size[0]/100, graph_size[1]/100])
     axes = plt.axes()
