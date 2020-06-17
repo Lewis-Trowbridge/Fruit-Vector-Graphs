@@ -7,17 +7,7 @@ import fruitvectors
 
 def line_graph(praw_client, start_limit=0, end_limit=-1, recent=True):
     fruit_vectors = fruitvectors.get_fruit_vectors(praw_client, recent, start_limit, end_limit)
-    scores = []
-    image_urls = []
-    # Iterate through the list backwards
-    for post_number in fruit_vectors:
-        current_fruit_vector = post_number
-        try:
-            image_urls.append(current_fruit_vector.url)
-            scores.append(current_fruit_vector.score)
-        # If a submission does not have an image, it is probably not useful
-        except AttributeError:
-            pass
+    scores, image_urls = fruitvectors.get_scores_and_urls(fruit_vectors)
     _save_line_graph(scores, image_urls)
 
 
@@ -62,4 +52,4 @@ def _save_line_graph(scores: list, urls: list):
         axes.add_artist(ab)
         count += 1
     vector_figure.add_axes(axes)
-    vector_figure.savefig("./figure.png", bbox_inches="tight")
+    vector_figure.savefig("./line.png", bbox_inches="tight")
